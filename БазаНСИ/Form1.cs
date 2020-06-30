@@ -15,8 +15,7 @@ using KAPITypes;
 using Excel = Microsoft.Office.Interop.Excel;
 using System.Diagnostics;
 using reference = System.Int32;
-//тестирование коммита 
-erroererererer
+
 
 
 namespace БазаНСИ
@@ -55,13 +54,25 @@ namespace БазаНСИ
 
         private void START()
         {
-           
+            Excel.Application ex = new Microsoft.Office.Interop.Excel.Application();
+            ex.Visible = true;
+            ex.SheetsInNewWorkbook = 2;
+            Excel.Workbook workBook = ex.Workbooks.Add(Type.Missing);
+            ex.DisplayAlerts = false;
+            Excel.Worksheet sheet = (Excel.Worksheet)ex.Worksheets.get_Item(1);
+            sheet.Name = "База НСИ";
+
+
+            
+            int stolb = 1;//   A - B - C - D     //Cells(5, 3) = C5
+            int stroka = 1; //  1-2-3    
+
             Console.WriteLine("Количество документов = " + path.Count);
             for (int i = 0; i < path.Count; i++)
             {
 
                 IKompasDocument doc = appl.Documents.Open(path[i], true, true);// Получаем интерфейс активного документа 2D в API7
-
+               
 
 
 
@@ -91,20 +102,7 @@ namespace БазаНСИ
 
                         ISpecificationCommentObject obj = SpcObjects[SD];
 
-                        var q = obj.Subsection;
-                        var q1 = obj.UniqueNumber;
-                        var q2 = obj.BaseObject;
-                        var q3 = obj.Columns;
-                        var q4 = obj.Parent;
-                        var q5 = obj.State;
-                        var q6 = obj.BlockNumber;
-                        var q7 = obj.BlockNumberByIndex[0];
-
-
-
-                        Console.WriteLine("!!!! ТИП ОБЬЕКТА " + (q,q1,q2,q3,q4,q5,q6,q7) + "   !!!!!");
-
-
+                      
                         ISpecificationColumns oC = obj.Columns;
                         Specification_Object = obj;
 
@@ -116,16 +114,23 @@ namespace БазаНСИ
                         Specification_Columns = Specification_Object.Columns;
                         Specification_Additional_Columns = Specification_Object.AdditionalColumns;
                         for (int bCol = 0; bCol < Specification_Columns.Count; bCol++)
-                        {
-                            
-
-
+                        {                        
 
                             Specification_Column = Specification_Columns[bCol];
                             var st = Specification_Column.Text.Str;
                             Console.WriteLine("Столбец " + (bCol + 1) + " - " + st);
+                            sheet.Cells[stroka,stolb] = st;
+
+
+
+                            stolb += 1;
+
+
+
                         }
                         Console.WriteLine("----- Конец cтроки ---- ");
+                        stolb = 1;
+                        stroka += 1;
 
 
 
@@ -149,13 +154,23 @@ namespace БазаНСИ
 
 
 
+            //sheet.Cells[1, 3].EntireColumn = 50;
+            
+            sheet.Columns["D:D"].ColumnWidth = 16.0;
+            sheet.Columns["E:E"].ColumnWidth = 25.0;
 
+            ex.Application.ActiveWorkbook.SaveAs("D:\\1111111111111111111.xlsx", Type.Missing,
+            Type.Missing, Type.Missing, Type.Missing, Type.Missing, Excel.XlSaveAsAccessMode.xlNoChange,
+            Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
 
+            //ObjWorkBook.SaveAs("C:\\1.xlsx");//сохранить в эксель файл
 
-
-
-
-
+            
+            workBook = null;
+            sheet = null;
+            ex.Quit();
+            ex = null;
+            GC.Collect();
 
 
 
