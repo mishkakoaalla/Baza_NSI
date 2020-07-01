@@ -44,8 +44,9 @@ namespace БазаНСИ
         public Form1()
         {
             InitializeComponent();
-            GetKompas();   
+            GetKompas();
             //START();
+            
         }
 
 
@@ -65,7 +66,16 @@ namespace БазаНСИ
 
             
             int stolb = 1;//   A - B - C - D     //Cells(5, 3) = C5
-            int stroka = 1; //  1-2-3    
+            int stroka = 1; //  1-2-3  
+            int nomer_Sps = 1;
+            spec_stroka[] Sps = new spec_stroka[1500];
+            //for (int i1 = 0; i1 <1000;i1++)
+            //{
+            //    Sps[i1] = new spec_stroka();
+            //}
+
+
+
 
             Console.WriteLine("Количество документов = " + path.Count);
             for (int i = 0; i < path.Count; i++)
@@ -109,7 +119,7 @@ namespace БазаНСИ
                         long qq = obj.Section;
                         Console.WriteLine("!!!!СЕКЦИЯ " + (qq) + "   !!!!!");
 
-
+                        Sps[nomer_Sps] = new spec_stroka();
 
                         Specification_Columns = Specification_Object.Columns;
                         Specification_Additional_Columns = Specification_Object.AdditionalColumns;
@@ -121,6 +131,33 @@ namespace БазаНСИ
                             Console.WriteLine("Столбец " + (bCol + 1) + " - " + st);
                             sheet.Cells[stroka,stolb] = st;
 
+                            switch (bCol)
+                            {
+                                case 0:
+                                    Sps[nomer_Sps].format = st;                                    
+                                    break;
+                                case 2:
+                                    Sps[nomer_Sps].poz = st;
+                                    break;
+                                case 3:
+                                    Sps[nomer_Sps].obozn = st;
+                                    break;
+                                case 4:
+                                    Sps[nomer_Sps].naimen = st;
+                                    break;
+                                case 5:
+                                    Sps[nomer_Sps].kol = st;
+                                    break;
+                                case 6:
+                                    Sps[nomer_Sps].prim = st;
+                                    break;
+                                
+
+                            }
+
+                           // Sps[kol_Sps].     
+
+
 
 
                             stolb += 1;
@@ -131,6 +168,7 @@ namespace БазаНСИ
                         Console.WriteLine("----- Конец cтроки ---- ");
                         stolb = 1;
                         stroka += 1;
+                        nomer_Sps += 1;
 
 
 
@@ -173,7 +211,17 @@ namespace БазаНСИ
             GC.Collect();
 
 
-
+            for (int i2 = 0; i2 < 1500; i2++)
+            {
+                if (Sps[i2] != null)
+                {
+                    if (Sps[i2].format != null)
+                    {
+                        Console.WriteLine("ПРОВЕРКА длина " + Sps.Length + "   " + "Объект "  );
+                        Sps[i2].GetInfoSst();
+                    }
+                }
+            }
 
         }
     
@@ -281,6 +329,10 @@ namespace БазаНСИ
             
         }
 
+
+
+
+        
 
     }
 }
