@@ -30,6 +30,7 @@ namespace БазаНСИ
         string aa, bb, cc;
 
         List<string> path = new List<string>();
+        List<string> path_name = new List<string>();
 
         void close_file()
         {
@@ -308,19 +309,26 @@ namespace БазаНСИ
             foreach (string obj in (string[])e.Data.GetData(DataFormats.FileDrop))
                 if (Directory.Exists(obj))
                 {
-                    path.AddRange(Directory.GetFiles(obj, "*.*", SearchOption.AllDirectories)
-                        .Where(f=> f.EndsWith(".cdw")|| f.EndsWith(".spw")).ToArray()
-                        
-                        
-                        );
+                    // path.AddRange(Directory.GetFiles(obj, "*.*", SearchOption.AllDirectories)
+                    //.Where(f=> f.EndsWith(".cdw")|| f.EndsWith(".spw")).ToArray()                
+
+                    //);
+                    MessageBox.Show("Не вабраны файлы с расширением  .cdw или .spw");
+
                 }
                 else
                 {
+                    string q = Path.GetFileName(obj);
+                    string w = Path.GetExtension(obj);
 
-                    path.Add(obj);
-                    Console.WriteLine("Док " + obj);
+                    if (w == ".cdw" || w == ".spw")
+                    {
+                        path.Add(obj);
+                        path_name.Add(q);
+                        Console.WriteLine("Докkkkkkkkkkkkkkkkkkkkkkkk " + w);
+                    }
                 }
-            label1.Text = string.Join("\r\n", path);
+            label1.Text = string.Join("\r\n", path_name);
 
             
            // label1.Text += file + "\n";
