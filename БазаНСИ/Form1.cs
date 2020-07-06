@@ -31,6 +31,7 @@ namespace БазаНСИ
 
         List<string> path = new List<string>();
         List<string> path_name = new List<string>();
+        List<string> spisok_sb = new List<string>();
 
         void close_file()
         {
@@ -56,15 +57,16 @@ namespace БазаНСИ
 
         private void START()
         {
-            Excel.Application ex = new Microsoft.Office.Interop.Excel.Application();
+            /*
+            Excel.Application ex = new Excel.Application();
             ex.Visible = true;
             ex.SheetsInNewWorkbook = 2;
             Excel.Workbook workBook = ex.Workbooks.Add(Type.Missing);
             ex.DisplayAlerts = false;
             Excel.Worksheet sheet = (Excel.Worksheet)ex.Worksheets.get_Item(1);
             sheet.Name = "База НСИ";
-
-
+            */
+    
             
             int stolb = 1;//   A - B - C - D     //Cells(5, 3) = C5
             int stroka = 1; //  1-2-3  
@@ -82,7 +84,7 @@ namespace БазаНСИ
             for (int i = 0; i < path.Count; i++)
             {
 
-                IKompasDocument doc = appl.Documents.Open(path[i], true, true);// Получаем интерфейс активного документа 2D в API7
+                IKompasDocument doc = appl.Documents.Open(path[i], true, false);// Получаем интерфейс активного документа 2D в API7
                
 
 
@@ -120,6 +122,8 @@ namespace БазаНСИ
                         long qq = obj.Section;
                         Console.WriteLine("!!!!СЕКЦИЯ " + (qq) + "   !!!!!");
 
+
+
                         Sps[nomer_Sps] = new spec_stroka();
 
                         Specification_Columns = Specification_Object.Columns;
@@ -130,7 +134,9 @@ namespace БазаНСИ
                             Specification_Column = Specification_Columns[bCol];
                             var st = Specification_Column.Text.Str;
                             Console.WriteLine("Столбец " + (bCol + 1) + " - " + st);
-                            sheet.Cells[stroka,stolb] = st;
+                            
+                            //Заполнение 
+                            //sheet.Cells[stroka,stolb] = st;
 
                             switch (bCol)
                             {
@@ -152,6 +158,7 @@ namespace БазаНСИ
                                 case 6:
                                     Sps[nomer_Sps].prim = st;
                                     break;
+
                                 
 
                             }
@@ -185,15 +192,34 @@ namespace БазаНСИ
                     Console.WriteLine("Пропущен документ (документ не спецификации, и не на чертеже)");
                     if (doc != null)
                     {
-                        doc.Close(0); //Закрыть документ
-                    }
 
+                        ksDocument2D docD = (ksDocument2D)kompas.ActiveDocument2D();
+                        ksStamp stamp = (ksStamp)docD.GetStamp();
+
+
+                        LayoutSheets _ls = doc.LayoutSheets;
+
+                        LayoutSheet LS = _ls.ItemByNumber[1];
+
+                        IStamp isamp = LS.Stamp;
+
+                        
+
+                        IText qq = isamp.Text[3];
+
+                        Console.WriteLine("ШТАМП -------------  " + qq.Str);
+
+
+
+                        //doc.Close(0); //Закрыть документ
+
+                    }
                 }
             }
 
 
 
-            //sheet.Cells[1, 3].EntireColumn = 50;
+            /*
             
             sheet.Columns["D:D"].ColumnWidth = 16.0;
             sheet.Columns["E:E"].ColumnWidth = 25.0;
@@ -202,16 +228,19 @@ namespace БазаНСИ
             Type.Missing, Type.Missing, Type.Missing, Type.Missing, Excel.XlSaveAsAccessMode.xlNoChange,
             Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
 
-            //ObjWorkBook.SaveAs("C:\\1.xlsx");//сохранить в эксель файл
+            
 
             
             workBook = null;
             sheet = null;
-            ex.Quit();
+            //ex.Quit();
             ex = null;
             GC.Collect();
 
+            */
 
+
+    
             for (int i2 = 0; i2 < 1500; i2++)
             {
                 if (Sps[i2] != null)
