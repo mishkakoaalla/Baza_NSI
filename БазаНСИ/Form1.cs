@@ -24,8 +24,15 @@ namespace БазаНСИ
     {
         private KompasObject kompas;
         private IApplication appl;         // Интерфейс приложения
-       // private IKompasDocument2D doc;          // Интерфейс документа 2D в API7 
-        //private ksDocument2D doc2D;        // Интерфейс документа 2D в API5
+
+        private bool tip_obj_base = false;  // Базовая ли спецификация или нет (по умолчание "нет")
+        public int num ; // Количеств острок в спецификации
+        public ISpecificationCommentObject obj; //Объект спецификации
+        public ISpecificationBaseObject obj_base; //Базовый Объект спецификации
+        public ISpecificationColumns oC ;
+
+        // public ыекш OBJ;
+
 
         string aa, bb, cc;
 
@@ -45,6 +52,7 @@ namespace БазаНСИ
 
         public Form1()
         {
+            //label1.Text = "Перенеси файлы сюда";
             InitializeComponent();
             GetKompas();
             //START();
@@ -57,7 +65,7 @@ namespace БазаНСИ
 
         private void START()
         {
-            /*
+            
             Excel.Application ex = new Excel.Application();
             ex.Visible = true;
             ex.SheetsInNewWorkbook = 2;
@@ -65,13 +73,23 @@ namespace БазаНСИ
             ex.DisplayAlerts = false;
             Excel.Worksheet sheet = (Excel.Worksheet)ex.Worksheets.get_Item(1);
             sheet.Name = "База НСИ";
-            */
+            
     
             
             int stolb = 1;//   A - B - C - D     //Cells(5, 3) = C5
             int stroka = 1; //  1-2-3  
             int nomer_Sps = 1;
             spec_stroka[] Sps = new spec_stroka[1500];
+
+            spec_stroka[] Sp_l1 = new spec_stroka[1500];
+            spec_stroka[] Sp_l2 = new spec_stroka[1500];
+            spec_stroka[] Sp_l3 = new spec_stroka[1500];
+            spec_stroka[] Sp_l4 = new spec_stroka[1500];
+            spec_stroka[] Sp_l5 = new spec_stroka[1500];
+
+
+
+
             //for (int i1 = 0; i1 <1000;i1++)
             //{
             //    Sps[i1] = new spec_stroka();
@@ -92,42 +110,69 @@ namespace БазаНСИ
                 Console.WriteLine("Получение спецификации из документа № - " + Convert.ToInt32(i+1) );
                 SpecificationDescription Specification_Descriptions = doc.SpecificationDescriptions.Active;
 
+
+
                 if (Specification_Descriptions != null)
                 {
 
                     ISpecificationCommentObjects SpcObjects = Specification_Descriptions.CommentObjects;
                     ISpecificationBaseObjects SpcObjectsBase = Specification_Descriptions.BaseObjects;
-                    
 
-                    var num = SpcObjects.Count;
+
+                    Console.WriteLine(" ВСПОМОГАТЕЛЬНЫЕ объекты " + SpcObjects.Count);
+                    Console.WriteLine(" Базовые объекты " + SpcObjectsBase.Count);
+                    int kol_com = SpcObjects.Count;
+                    int kol_base= SpcObjectsBase.Count;
+
+                    if(kol_com == 0 & kol_base >0)
+                    {
+                        tip_obj_base = true;
+                        num = kol_base;
+                    }
+                    if (kol_base == 0 & kol_com > 0)
+                    {
+                        tip_obj_base = false;
+                        num = kol_com;
+                    }
+
+
+
+
                     ISpecificationObject Specification_Object;
-                    ISpecificationColumns Specification_Columns;
-                    ISpecificationColumns Specification_Additional_Columns;
+                    ISpecificationColumns Specification_Columns;                    
                     ISpecificationColumn Specification_Column;
 
-
+                    // Начало блока вспомагательных объктов
                     for (int SD = 0; SD < num; SD++)
                     {
                         Console.WriteLine("----- Строка " + (SD + 1) + "   ---- ");
                         Console.WriteLine("");
                         //var ww = SpcObjects[SD];
+                        if (!tip_obj_base )
+                        {
+                           
+                            ISpecificationCommentObject obj = SpcObjects[SD];
+                            var OBJ = obj;
+                            ISpecificationColumns oC = obj.Columns;
+                            long qq = obj.Section;
+                            Console.WriteLine("!!!!СЕКЦИЯ " + (qq) + "   !!!!!");
+                            Specification_Object = obj;
+                        }
+                        else
+                        {
+                            ISpecificationBaseObject obj_base = SpcObjectsBase[SD];
+                            var OBJ = obj_base;
+                            ISpecificationColumns oC = obj_base.Columns;
+                            long qq = obj_base.Section;
+                            Console.WriteLine("!!!!СЕКЦИЯ " + (qq) + "   !!!!!");
+                            Specification_Object = obj_base;
+                        }
+                                             
+
                         
 
-                        ISpecificationCommentObject obj = SpcObjects[SD];
-
-                      
-                        ISpecificationColumns oC = obj.Columns;
-                        Specification_Object = obj;
-
-                        long qq = obj.Section;
-                        Console.WriteLine("!!!!СЕКЦИЯ " + (qq) + "   !!!!!");
-
-
-
                         Sps[nomer_Sps] = new spec_stroka();
-
-                        Specification_Columns = Specification_Object.Columns;
-                        Specification_Additional_Columns = Specification_Object.AdditionalColumns;
+                        Specification_Columns = Specification_Object.Columns;                        
                         for (int bCol = 0; bCol < Specification_Columns.Count; bCol++)
                         {                        
 
@@ -136,7 +181,7 @@ namespace БазаНСИ
                             Console.WriteLine("Столбец " + (bCol + 1) + " - " + st);
                             
                             //Заполнение 
-                            //sheet.Cells[stroka,stolb] = st;
+                            sheet.Cells[stroka,stolb] = st;
 
                             switch (bCol)
                             {
@@ -157,31 +202,30 @@ namespace БазаНСИ
                                     break;
                                 case 6:
                                     Sps[nomer_Sps].prim = st;
-                                    break;
-
-                                
+                                    break;                              
 
                             }
-
-                           // Sps[kol_Sps].     
-
-
-
+                         
 
                             stolb += 1;
 
-
-
+                            
                         }
                         Console.WriteLine("----- Конец cтроки ---- ");
                         stolb = 1;
                         stroka += 1;
                         nomer_Sps += 1;
-
-
-
-
                     }
+                    
+
+
+
+
+
+
+
+
+
                     if (doc != null)
                     {
                         doc.Close(0); //Закрыть документ
@@ -204,10 +248,12 @@ namespace БазаНСИ
                         IStamp isamp = LS.Stamp;
 
                         
-
+                         
                         IText qq = isamp.Text[3];
+                        IText ww = isamp.Text[2];
 
-                        Console.WriteLine("ШТАМП -------------  " + qq.Str);
+                        Console.WriteLine("ШТАМП Материал -------------  " + qq.Str);
+                        Console.WriteLine("ШТАМП Обозначение -------------  " + ww.Str);
 
 
 
@@ -219,25 +265,43 @@ namespace БазаНСИ
 
 
 
-            /*
+            
             
             sheet.Columns["D:D"].ColumnWidth = 16.0;
             sheet.Columns["E:E"].ColumnWidth = 25.0;
-
-            ex.Application.ActiveWorkbook.SaveAs("D:\\1111111111111111111.xlsx", Type.Missing,
-            Type.Missing, Type.Missing, Type.Missing, Type.Missing, Excel.XlSaveAsAccessMode.xlNoChange,
-            Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
-
             
 
-            
-            workBook = null;
+
+
+
+
+            try
+            {
+
+                    ex.Application.ActiveWorkbook.SaveAs("D:\\1111111111111111111.xlsx", Type.Missing,
+                    Type.Missing, Type.Missing, Type.Missing, Type.Missing, Excel.XlSaveAsAccessMode.xlNoChange,
+                    Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
+
+            }
+            catch 
+            {
+
+                MessageBox.Show("Сперва закройте БазуНСИ");
+            }
+
+
+
+
+
+
+
+                workBook = null;
             sheet = null;
             //ex.Quit();
             ex = null;
             GC.Collect();
 
-            */
+            
 
 
     
@@ -317,6 +381,13 @@ namespace БазаНСИ
 
         }
 
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            path.Clear();
+            path_name.Clear();
+            label1.Text = "Перенеси файлы сюда";
+        }
+
         void panel1_DragEnter(object sender, DragEventArgs e)
         {
            if (e.Data.GetDataPresent(DataFormats.FileDrop))
@@ -341,8 +412,8 @@ namespace БазаНСИ
                     // path.AddRange(Directory.GetFiles(obj, "*.*", SearchOption.AllDirectories)
                     //.Where(f=> f.EndsWith(".cdw")|| f.EndsWith(".spw")).ToArray()                
 
-                    //);
-                    MessageBox.Show("Не вабраны файлы с расширением  .cdw или .spw");
+                   // );
+                    //MessageBox.Show("Не вабраны файлы с расширением  .cdw или .spw");
 
                 }
                 else
