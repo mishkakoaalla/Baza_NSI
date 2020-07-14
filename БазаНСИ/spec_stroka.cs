@@ -29,10 +29,13 @@ namespace БазаНСИ
 
         public void GetInfoSst()
         {
-            Console.WriteLine($" Формат : {format} Позиция: {poz}  Обозначение: {obozn}  Наименование: {naimen}  Количество : {kol}  Примечание {prim} ");
+            Console.WriteLine($" Формат : {format} Позиция: {poz}  Обозначение: {obozn}  Наименование: {naimen}  Количество : {kol}  Примечание: {prim} ");
         }
 
-
+        public void GetNameFiles()
+        {
+            Console.WriteLine($" Позиция: {poz}  Обозначение: {obozn} ");
+        }
 
     }
 }
