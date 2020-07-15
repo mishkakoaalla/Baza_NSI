@@ -17,6 +17,7 @@ namespace БазаНСИ
         public string prim { get; set; }
 
 
+        public string tip_stroki { get; set; } //Сборка, деталь, материал, прочие изделия, БЧ ....
         public string material { get; set; }
         public string doc_name { get; set; }
 
@@ -33,11 +34,19 @@ namespace БазаНСИ
 
             material = material;
             doc_name = doc_name;
+            tip_stroki = tip_stroki;
         }
 
         public void GetInfoSst()
         {
-            Console.WriteLine($" Формат : {format} Позиция: {poz}  Обозначение: {obozn}  Наименование: {naimen}  Количество : {kol}  Примечание: {prim} ");
+            if (tip_stroki != "Материал из детали")
+            {
+                Console.WriteLine($" Имя документа : {doc_name} Тип строки: {tip_stroki}  Обозначение: {obozn}  Наименование: {naimen}  Количество : {kol}  ");
+            }
+            else
+            {
+                Console.WriteLine($" Имя документа : {doc_name} Тип строки: {tip_stroki}  Обозначение: {obozn}  Наименование: {naimen}  Количество : {kol}  Материал: {material} ");
+            }
         }
 
         public void GetNameFiles()

@@ -15,13 +15,18 @@ using KAPITypes;
 using Excel = Microsoft.Office.Interop.Excel;
 using System.Diagnostics;
 using reference = System.Int32;
+using System.Text.RegularExpressions;
+
+
 
 
 
 namespace БазаНСИ
 {
+
     public partial class Form1 : Form
     {
+        
         private KompasObject kompas;
         private IApplication appl;         // Интерфейс приложения
 
@@ -45,9 +50,9 @@ namespace БазаНСИ
         List<string> path_name = new List<string>();
         List<string> spisok_sb = new List<string>();
         List<object> spisok_doc = new List<object>();
+        spec_stroka[] Sps = new spec_stroka[1500];
 
 
-        
 
         void close_file()
         {
@@ -65,14 +70,36 @@ namespace БазаНСИ
             InitializeComponent();
             GetKompas();
             //START();
+            Console.WindowWidth = 200;
+            //Console.BufferWidth = 1000;
+
+            
+
+        }
+
+
+        public string ObrezFileName(string pp)
+        {
+                string obrez_do_naimen = Path.GetFileName(pp).Remove(Path.GetFileName(pp).IndexOf(" "));
+                string subString = "СБ";
+                int indexOfSubstring = obrez_do_naimen.IndexOf(subString);
+                if (indexOfSubstring > 0)
+                {
+                    obrez_SB = obrez_do_naimen.Substring(0, obrez_do_naimen.Length - 2);
+                }
+                else
+                {
+                    obrez_SB = obrez_do_naimen;
+                }
+
+                return obrez_SB;
+                //Spisok_dok[ip].GetNameFiles();
+                //Console.WriteLine("Tessssssssssssssssssssssst "+Spisok_dok[ip].NameDoc());
             
         }
 
 
-
-
-
-        private void START()
+        public void START()
         {
             /*
             Excel.Application ex = new Excel.Application();
@@ -92,13 +119,9 @@ namespace БазаНСИ
 
 
 
-            spec_stroka[] Sps = new spec_stroka[1500];
+            
 
-            spec_stroka[] Sp_l1 = new spec_stroka[1500];
-            spec_stroka[] Sp_l2 = new spec_stroka[1500];
-            spec_stroka[] Sp_l3 = new spec_stroka[1500];
-            spec_stroka[] Sp_l4 = new spec_stroka[1500];
-            spec_stroka[] Sp_l5 = new spec_stroka[1500];
+
 
 
             spec_stroka[] Spisok_dok = new spec_stroka[1500];
@@ -110,28 +133,7 @@ namespace БазаНСИ
             //    Sps[i1] = new spec_stroka();
             //}
 
-            for (int ip = 0; ip < path.Count; ip++)
-            {
-                Spisok_dok[ip] = new spec_stroka();
-                Spisok_dok[ip].poz = ip.ToString();
-
-
-                string obrez_do_naimen = Path.GetFileName(path[ip]).Remove(Path.GetFileName(path[ip]).IndexOf(" "));
-                string subString = "СБ";
-                int indexOfSubstring = obrez_do_naimen.IndexOf(subString);
-                if (indexOfSubstring > 0)
-                {
-                    obrez_SB = obrez_do_naimen.Substring(0, obrez_do_naimen.Length - 2);
-                }
-                else
-                {
-                    obrez_SB = obrez_do_naimen;
-                }
-
-                Spisok_dok[ip].obozn = obrez_SB;
-                Spisok_dok[ip].GetNameFiles();
-                //Console.WriteLine("Tessssssssssssssssssssssst "+Spisok_dok[ip].NameDoc());
-            }
+            
 
 
 
@@ -176,7 +178,7 @@ namespace БазаНСИ
                     ISpecificationColumns Specification_Columns;
                     ISpecificationColumn Specification_Column;
 
-                    // Начало блока вспомагательных объктов
+                    // Начало блока вспомагательных объктов 
                     for (int SD = 0; SD < num; SD++)
                     {
                         Console.WriteLine("----- Строка " + (SD + 1) + "   ---- ");
@@ -191,7 +193,7 @@ namespace БазаНСИ
                             Console.WriteLine("!!!!СЕКЦИЯ " + (qq) + "   !!!!!");
                             Specification_Object = obj;
                             nomer_razdela = qq;
-
+                            //5 - документация   10 - комплексы    15 - сборочные единицы   20 - детали    25 - стандартные изделия   30 - прочие изделия    35 - материалы      40 - комплекты
                         }
                         else
                         {
@@ -212,6 +214,30 @@ namespace БазаНСИ
                         {
 
                             Sps[nomer_Sps] = new spec_stroka();
+                            Sps[nomer_Sps].doc_name = ObrezFileName(path[i]);
+
+                            if (nomer_razdela == 15 | nomer_razdela_base == 15 )
+                            {
+                                Sps[nomer_Sps].tip_stroki = "CБ";
+                            }
+                            if (nomer_razdela == 25 | nomer_razdela_base == 25)
+                            {
+                                Sps[nomer_Sps].tip_stroki = "СТ";
+                            }
+                            if (nomer_razdela == 30 | nomer_razdela_base == 30)
+                            {
+                                Sps[nomer_Sps].tip_stroki = "П";
+                            }
+                            if (nomer_razdela == 35 | nomer_razdela_base == 35)
+                            {
+                                Sps[nomer_Sps].tip_stroki = "М";
+                            }
+
+
+
+
+
+
                             Specification_Columns = Specification_Object.Columns;
 
                             for (int bCol = 0; bCol < Specification_Columns.Count; bCol++)
@@ -222,11 +248,28 @@ namespace БазаНСИ
 
                                 //Заполнение      /////////////////////////////////////                            ///////////////////////////
                                 //sheet.Cells[stroka, stolb] = st;
+                                if (nomer_razdela == 20 | nomer_razdela_base == 20)
+                                {
+                                    if (bCol == 0)
+                                    {
+                                        if (st != "БЧ")
+                                        {
+                                            Sps[nomer_Sps].tip_stroki = "Д";
+                                        }
+                                        else
+                                        {
+                                            Sps[nomer_Sps].tip_stroki = "БЧ";
+                                        }
+                                    }
+                                    
+                                }
 
                                 switch (bCol)
                                 {
                                     case 0:
                                         Sps[nomer_Sps].format = st;
+
+
                                         break;
                                     case 2:
                                         Sps[nomer_Sps].poz = st;
@@ -235,7 +278,9 @@ namespace БазаНСИ
                                         Sps[nomer_Sps].obozn = st;
                                         break;
                                     case 4:
-                                        Sps[nomer_Sps].naimen = st;
+                                        //Sps[nomer_Sps].naimen = st;
+                                        Sps[nomer_Sps].naimen = Regex.Replace(st, @"[ \n]", " ");
+
                                         break;
                                     case 5:
                                         Sps[nomer_Sps].kol = st;
@@ -253,6 +298,8 @@ namespace БазаНСИ
                            // stolb = 1;
                             //stroka += 1;
                             nomer_Sps += 1;
+                            nomer_razdela = 0;
+                            nomer_razdela_base = 0;
 
                         }
                     }
@@ -284,8 +331,13 @@ namespace БазаНСИ
                         Console.WriteLine("ШТАМП Материал -------------  " + qq.Str);
                         Console.WriteLine("ШТАМП Обозначение -------------  " + ww.Str);
 
+                        Sps[nomer_Sps] = new spec_stroka();
+                        Sps[nomer_Sps].doc_name = ObrezFileName(path[i]);
+                        Sps[nomer_Sps].obozn = ww.Str;
+                        Sps[nomer_Sps].tip_stroki = "Материал из детали";
+                        Sps[nomer_Sps].material = qq.Str;
 
-
+                        nomer_Sps += 1;
                         doc.Close(0); //Закрыть документ
 
                     }
@@ -345,9 +397,9 @@ namespace БазаНСИ
             {
                 if (Sps[i2] != null)
                 {
-                    if (Sps[i2].format != null)
+                    if (Sps[i2].obozn != null)
                     {
-                        Console.WriteLine("ПРОВЕРКА длина " + Sps.Length + "   " );
+                        
                         Sps[i2].GetInfoSst();
                         
                     }
@@ -384,13 +436,15 @@ namespace БазаНСИ
 
                 kompas = (KompasObject)System.Runtime.InteropServices.Marshal.GetActiveObject("kompas.application.5");
                 appl = (IApplication)kompas.ksGetApplication7();
-                MessageBox.Show("Подключение установлено");
+                //MessageBox.Show("Подключение установлено");
+                Console.WriteLine("Подключение установлено");
                 appl.KompasError.Clear();
 
             }
             catch
             {
-                MessageBox.Show("Компас не запущен - ЗАПУСКАЕМ ");
+                //MessageBox.Show("Компас не запущен - ЗАПУСКАЕМ ");
+                Console.WriteLine("Компас не запущен - ЗАПУСКАЕМ");
                 Type t = Type.GetTypeFromProgID("KOMPAS.Application.5");
                 kompas = (KompasObject)Activator.CreateInstance(t);
                 kompas = (KompasObject)System.Runtime.InteropServices.Marshal.GetActiveObject("kompas.application.5");
@@ -418,8 +472,6 @@ namespace БазаНСИ
         {
             START();
 
-            short t = 4;
-            int nn = 0;
             
             
 
@@ -435,8 +487,11 @@ namespace БазаНСИ
             label1.Text = "Перенеси файлы сюда";
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        public void button3_Click(object sender, EventArgs e)
         {
+            
+            Console.WriteLine("-------------------------\n-------------------------\n-------------------------");
+            Console.WriteLine(Sps[1].doc_name);
 
 
         }
