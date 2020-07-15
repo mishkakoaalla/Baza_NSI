@@ -44,6 +44,10 @@ namespace БазаНСИ
         List<string> path = new List<string>();
         List<string> path_name = new List<string>();
         List<string> spisok_sb = new List<string>();
+        List<object> spisok_doc = new List<object>();
+
+
+        
 
         void close_file()
         {
@@ -70,7 +74,7 @@ namespace БазаНСИ
 
         private void START()
         {
-            
+            /*
             Excel.Application ex = new Excel.Application();
             ex.Visible = true;
             ex.SheetsInNewWorkbook = 2;
@@ -78,12 +82,16 @@ namespace БазаНСИ
             ex.DisplayAlerts = false;
             Excel.Worksheet sheet = (Excel.Worksheet)ex.Worksheets.get_Item(1);
             sheet.Name = "База НСИ";
-            
-    
-            
+            */
+
+
             int stolb = 1;//   A - B - C - D     //Cells(5, 3) = C5
             int stroka = 1; //  1-2-3  
             int nomer_Sps = 1;
+
+
+
+
             spec_stroka[] Sps = new spec_stroka[1500];
 
             spec_stroka[] Sp_l1 = new spec_stroka[1500];
@@ -106,14 +114,14 @@ namespace БазаНСИ
             {
                 Spisok_dok[ip] = new spec_stroka();
                 Spisok_dok[ip].poz = ip.ToString();
-                
+
 
                 string obrez_do_naimen = Path.GetFileName(path[ip]).Remove(Path.GetFileName(path[ip]).IndexOf(" "));
                 string subString = "СБ";
                 int indexOfSubstring = obrez_do_naimen.IndexOf(subString);
                 if (indexOfSubstring > 0)
                 {
-                   obrez_SB = obrez_do_naimen.Substring(0, obrez_do_naimen.Length - 2);
+                    obrez_SB = obrez_do_naimen.Substring(0, obrez_do_naimen.Length - 2);
                 }
                 else
                 {
@@ -122,20 +130,18 @@ namespace БазаНСИ
 
                 Spisok_dok[ip].obozn = obrez_SB;
                 Spisok_dok[ip].GetNameFiles();
+                //Console.WriteLine("Tessssssssssssssssssssssst "+Spisok_dok[ip].NameDoc());
             }
-            
+
 
 
             Console.WriteLine("Количество документов = " + path.Count);
             for (int i = 0; i < path.Count; i++)
             {
-                
+
+
                 IKompasDocument doc = appl.Documents.Open(path[i], true, false);// Получаем интерфейс активного документа 2D в API7
-                
-
-
-
-                Console.WriteLine("Получение спецификации из документа № - " + Convert.ToInt32(i+1) );
+                Console.WriteLine("Получение спецификации из документа № - " + Convert.ToInt32(i + 1));
                 SpecificationDescription Specification_Descriptions = doc.SpecificationDescriptions.Active;
 
 
@@ -147,8 +153,8 @@ namespace БазаНСИ
                     ISpecificationBaseObjects SpcObjectsBase = Specification_Descriptions.BaseObjects;
 
 
-                    Console.WriteLine(" ВСПОМОГАТЕЛЬНЫЕ объекты " + SpcObjects.Count);
-                    Console.WriteLine(" Базовые объекты " + SpcObjectsBase.Count);
+                    //Console.WriteLine(" ВСПОМОГАТЕЛЬНЫЕ объекты " + SpcObjects.Count);
+                    //Console.WriteLine(" Базовые объекты " + SpcObjectsBase.Count);
                     int kol_com = SpcObjects.Count;
                     int kol_base = SpcObjectsBase.Count;
 
@@ -203,52 +209,54 @@ namespace БазаНСИ
                             continue;
                         }
                         else
-                        { 
+                        {
 
                             Sps[nomer_Sps] = new spec_stroka();
                             Specification_Columns = Specification_Object.Columns;
 
-                        for (int bCol = 0; bCol < Specification_Columns.Count; bCol++)
-                        {
-                            Specification_Column = Specification_Columns[bCol];
-                            var st = Specification_Column.Text.Str;
-                            Console.WriteLine("Столбец " + (bCol + 1) + " - " + st);
-
-                            //Заполнение 
-                            sheet.Cells[stroka, stolb] = st;
-
-                            switch (bCol)
+                            for (int bCol = 0; bCol < Specification_Columns.Count; bCol++)
                             {
-                                case 0:
-                                    Sps[nomer_Sps].format = st;
-                                    break;
-                                case 2:
-                                    Sps[nomer_Sps].poz = st;
-                                    break;
-                                case 3:
-                                    Sps[nomer_Sps].obozn = st;
-                                    break;
-                                case 4:
-                                    Sps[nomer_Sps].naimen = st;
-                                    break;
-                                case 5:
-                                    Sps[nomer_Sps].kol = st;
-                                    break;
-                                case 6:
-                                    Sps[nomer_Sps].prim = st;
-                                    break;
+                                Specification_Column = Specification_Columns[bCol];
+                                var st = Specification_Column.Text.Str;
+                                Console.WriteLine("Столбец " + (bCol + 1) + " - " + st);
 
+                                //Заполнение      /////////////////////////////////////                            ///////////////////////////
+                                //sheet.Cells[stroka, stolb] = st;
+
+                                switch (bCol)
+                                {
+                                    case 0:
+                                        Sps[nomer_Sps].format = st;
+                                        break;
+                                    case 2:
+                                        Sps[nomer_Sps].poz = st;
+                                        break;
+                                    case 3:
+                                        Sps[nomer_Sps].obozn = st;
+                                        break;
+                                    case 4:
+                                        Sps[nomer_Sps].naimen = st;
+                                        break;
+                                    case 5:
+                                        Sps[nomer_Sps].kol = st;
+                                        break;
+                                    case 6:
+                                        Sps[nomer_Sps].prim = st;
+                                        break;
+
+                                }
+
+                                //stolb += 1;
                             }
 
-                            stolb += 1;
-                        }
+                            Console.WriteLine("----- Конец cтроки ---- ");
+                           // stolb = 1;
+                            //stroka += 1;
+                            nomer_Sps += 1;
 
-                        Console.WriteLine("----- Конец cтроки ---- ");
-                        stolb = 1;
-                        stroka += 1;
-                        nomer_Sps += 1;
+                        }
                     }
-                }
+                
                     
 
                                                                                                                        
@@ -282,18 +290,24 @@ namespace БазаНСИ
 
                     }
                 }
+
+                doc.Close(0);
+                Console.WriteLine("");
+                Console.WriteLine("-Проверка-");
+
+
+
+
+
+
             }
 
 
 
-            
-            
-            sheet.Columns["D:D"].ColumnWidth = 16.0;
-            sheet.Columns["E:E"].ColumnWidth = 25.0;
-            
+            ////////////////////////////////////////////////////////////////////////////////////////
 
-
-
+            //sheet.Columns["D:D"].ColumnWidth = 16.0;
+            // sheet.Columns["E:E"].ColumnWidth = 25.0;
 
 
             try
@@ -313,8 +327,8 @@ namespace БазаНСИ
 
 
 
-
-
+            ///////////////////////////////////////////
+            /*
 
             workBook = null;
             sheet = null;
@@ -322,6 +336,7 @@ namespace БазаНСИ
             ex = null;
             GC.Collect();
 
+             */
             
 
 
@@ -332,17 +347,26 @@ namespace БазаНСИ
                 {
                     if (Sps[i2].format != null)
                     {
-                        Console.WriteLine("ПРОВЕРКА длина " + Sps.Length + "   " + "Объект "  );
+                        Console.WriteLine("ПРОВЕРКА длина " + Sps.Length + "   " );
                         Sps[i2].GetInfoSst();
+                        
                     }
                 }
             }
+
+            
+
 
         }
     
 
 
+        string ObrezName()
+        {
 
+
+            return Name;
+        }
 
 
     
@@ -409,6 +433,12 @@ namespace БазаНСИ
             path.Clear();
             path_name.Clear();
             label1.Text = "Перенеси файлы сюда";
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+
+
         }
 
         void panel1_DragEnter(object sender, DragEventArgs e)

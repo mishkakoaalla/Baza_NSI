@@ -77,6 +77,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Baza.cs" />
+    <Compile Include="Doc.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

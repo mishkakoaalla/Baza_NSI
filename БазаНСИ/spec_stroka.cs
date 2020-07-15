@@ -16,8 +16,13 @@ namespace БазаНСИ
         public string kol { get; set; }
         public string prim { get; set; }
 
+
+        public string material { get; set; }
+        public string doc_name { get; set; }
+
         public spec_stroka()
         {
+            
             nomer = nomer;
             format = format;
             poz = poz;
@@ -25,6 +30,9 @@ namespace БазаНСИ
             naimen = naimen;
             kol = kol;
             prim = prim;
+
+            material = material;
+            doc_name = doc_name;
         }
 
         public void GetInfoSst()
@@ -35,6 +43,13 @@ namespace БазаНСИ
         public void GetNameFiles()
         {
             Console.WriteLine($" Позиция: {poz}  Обозначение: {obozn} ");
+            
+        }
+
+         public string NameDoc()
+        {
+            string dd = obozn;
+            return dd;
         }
 
     }
