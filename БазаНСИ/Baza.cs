@@ -38,7 +38,7 @@ namespace БазаНСИ
 
         public void DrawBase()
         {
-            Console.WriteLine($" : {vhodimost} : {naimen} : {type_cher} : {ispolnitel} : {gotovnost} : {kuda_vhodit} : {material} : {kol} ");
+            Console.WriteLine($" : {vhodimost} : {naimen} : {obozn} : {type_cher} : {ispolnitel} : {gotovnost} : {kuda_vhodit} : {material} : {kol} ");
         }
 
 

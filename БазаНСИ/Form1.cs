@@ -35,7 +35,7 @@ namespace БазаНСИ
         public int nomer_razdela = 0;
         public int nomer_razdela_base = 0;
         public string obrez_SB;
-
+        public int stroka_base;
 
         public ISpecificationCommentObject obj; //Объект спецификации
         public ISpecificationBaseObject obj_base; //Базовый Объект спецификации
@@ -51,6 +51,7 @@ namespace БазаНСИ
         List<string> spisok_sb = new List<string>();
         List<object> spisok_doc = new List<object>();
         spec_stroka[] Sps = new spec_stroka[1500];
+        Baza[] Base = new Baza[1500];
 
 
 
@@ -142,7 +143,7 @@ namespace БазаНСИ
             {
 
 
-                IKompasDocument doc = appl.Documents.Open(path[i], true, false);// Получаем интерфейс активного документа 2D в API7
+                IKompasDocument doc = appl.Documents.Open(path[i], false, false);// Получаем интерфейс активного документа 2D в API7
                 Console.WriteLine("Получение спецификации из документа № - " + Convert.ToInt32(i + 1));
                 SpecificationDescription Specification_Descriptions = doc.SpecificationDescriptions.Active;
 
@@ -487,14 +488,6 @@ namespace БазаНСИ
             label1.Text = "Перенеси файлы сюда";
         }
 
-        public void button3_Click(object sender, EventArgs e)
-        {
-            
-            Console.WriteLine("-------------------------\n-------------------------\n-------------------------");
-            Console.WriteLine(Sps[1].doc_name);
-
-
-        }
 
         void panel1_DragEnter(object sender, DragEventArgs e)
         {
@@ -505,9 +498,22 @@ namespace БазаНСИ
 
         }
 
+        private void button4_Click(object sender, EventArgs e)
+        {
+            for (int i2 = 0; i2 < Base.Length; i2++)
+            {
+                if (Base[i2] != null)
+                {
+                    if (Base[i2].ispolnitel != null)
+                    {
 
+                        Base[i2].DrawBase();
 
+                    }
+                }
+            }
 
+        }
 
         void panel1_DragDrop(object sender, DragEventArgs e)
         {
@@ -548,7 +554,55 @@ namespace БазаНСИ
 
 
 
-        
+
+        public void button3_Click(object sender, EventArgs e)
+        {
+
+            Console.WriteLine("-------------------------\n-------------------------\n-------------------------");
+            Console.WriteLine(Sps[1].doc_name);
+            Base[0] = new Baza();
+            Base[0].obozn = ObrezFileName(path[0]);
+            Base[0].ispolnitel = textBox1.Text;
+            stroka_base = 1;
+
+            for (int i=0; i< Sps.Length; i++)
+            {
+                
+                if (Sps[i]!= null)
+                {
+                    if (Sps[i].tip_stroki == "CБ")
+                    {
+                        Base[stroka_base] = new Baza();
+                        Base[stroka_base].obozn = Sps[i].obozn;
+                        Base[stroka_base].ispolnitel = textBox1.Text;
+                        stroka_base += 1;
+                        Console.WriteLine("Это сборка " + i);
+                        for (int i2 = 0; i2 < Sps.Length; i2++)
+                        {
+                            if (Sps[i2] != null)
+                            {
+                                if(Sps[i2].doc_name == Sps[i].obozn)
+                                {
+                                    Base[stroka_base] = new Baza();
+                                    Base[stroka_base].obozn = Sps[i2].obozn;
+                                    Base[stroka_base].ispolnitel = textBox1.Text;
+                                    stroka_base += 1;
+
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
+
+
+
+
+
+
+
+        }
 
     }
 }
