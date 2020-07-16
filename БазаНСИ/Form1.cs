@@ -93,12 +93,27 @@ namespace БазаНСИ
                     obrez_SB = obrez_do_naimen;
                 }
 
-                return obrez_SB;
-                //Spisok_dok[ip].GetNameFiles();
-                //Console.WriteLine("Tessssssssssssssssssssssst "+Spisok_dok[ip].NameDoc());
-            
+                return obrez_SB;           
         }
 
+
+        public string ObrezSB(string ss)
+        {
+            string obrez_do_naimen = ss;
+            string subString = "СБ";
+            int indexOfSubstring = obrez_do_naimen.IndexOf(subString);
+            if (indexOfSubstring > 0)
+            {
+                obrez_SB = obrez_do_naimen.Substring(0, obrez_do_naimen.Length - 2);
+            }
+            else
+            {
+                obrez_SB = obrez_do_naimen;
+            }
+
+            return obrez_SB;
+
+        }
 
         public void START()
         {
@@ -145,8 +160,11 @@ namespace БазаНСИ
 
                 IKompasDocument doc = appl.Documents.Open(path[i], false, false);// Получаем интерфейс активного документа 2D в API7
                 Console.WriteLine("Получение спецификации из документа № - " + Convert.ToInt32(i + 1));
+                
                 SpecificationDescription Specification_Descriptions = doc.SpecificationDescriptions.Active;
 
+                Specification_Descriptions.ShowExcludedObjects = true;
+                Specification_Descriptions.Update();
 
 
                 if (Specification_Descriptions != null)
@@ -155,7 +173,7 @@ namespace БазаНСИ
                     ISpecificationCommentObjects SpcObjects = Specification_Descriptions.CommentObjects;
                     ISpecificationBaseObjects SpcObjectsBase = Specification_Descriptions.BaseObjects;
 
-
+                    (ISpecificationBaseObjects)SpcObjectsBase.Draw
                     //Console.WriteLine(" ВСПОМОГАТЕЛЬНЫЕ объекты " + SpcObjects.Count);
                     //Console.WriteLine(" Базовые объекты " + SpcObjectsBase.Count);
                     int kol_com = SpcObjects.Count;
@@ -207,15 +225,24 @@ namespace БазаНСИ
                             nomer_razdela_base = qq;
                         }
 
-                        if ((nomer_razdela == 5) | (nomer_razdela_base == 5))
+                        if(((nomer_razdela == 5) | (nomer_razdela_base == 5)) & (i!=0))
                         {
-                            continue;
+                            Console.WriteLine("----------------Пропуск раздела документация-------------------");
+                                continue;                              
                         }
                         else
                         {
 
                             Sps[nomer_Sps] = new spec_stroka();
                             Sps[nomer_Sps].doc_name = ObrezFileName(path[i]);
+                            Sps[nomer_Sps].sortir = false;
+
+
+                            if (nomer_razdela == 5 | nomer_razdela_base == 5)
+                            {
+                                Sps[nomer_Sps].tip_stroki = "CБ";
+                                Console.WriteLine("----------------Запись раздела документация  ГЛАВНОГО ДОКУМЕНТА-------------------");
+                            }
 
                             if (nomer_razdela == 15 | nomer_razdela_base == 15 )
                             {
@@ -276,11 +303,20 @@ namespace БазаНСИ
                                         Sps[nomer_Sps].poz = st;
                                         break;
                                     case 3:
-                                        Sps[nomer_Sps].obozn = st;
+                                        //Sps[nomer_Sps].obozn = st;
+                                        Sps[nomer_Sps].obozn = ObrezSB(st);
                                         break;
                                     case 4:
                                         //Sps[nomer_Sps].naimen = st;
-                                        Sps[nomer_Sps].naimen = Regex.Replace(st, @"[ \n]", " ");
+                                        if (nomer_razdela == 5 | nomer_razdela_base == 5)
+                                        {
+                                            Sps[nomer_Sps].naimen = textBox4.Text;
+                                        }
+                                        else
+                                        {
+
+                                            Sps[nomer_Sps].naimen = Regex.Replace(st, @"[ \n]", " ");
+                                        }
 
                                         break;
                                     case 5:
@@ -337,6 +373,7 @@ namespace БазаНСИ
                         Sps[nomer_Sps].obozn = ww.Str;
                         Sps[nomer_Sps].tip_stroki = "Материал из детали";
                         Sps[nomer_Sps].material = qq.Str;
+                        Sps[nomer_Sps].sortir = false;
 
                         nomer_Sps += 1;
                         doc.Close(0); //Закрыть документ
@@ -398,7 +435,7 @@ namespace БазаНСИ
             {
                 if (Sps[i2] != null)
                 {
-                    if (Sps[i2].obozn != null)
+                    if (Sps[i2].sortir != null)
                     {
                         
                         Sps[i2].GetInfoSst();
@@ -414,12 +451,7 @@ namespace БазаНСИ
     
 
 
-        string ObrezName()
-        {
 
-
-            return Name;
-        }
 
 
     
@@ -471,14 +503,7 @@ namespace БазаНСИ
 
         private void button2_Click(object sender, EventArgs e)
         {
-            START();
-
-            
-            
-
-            
-
-
+            START();  
         }
 
         private void button1_Click_1(object sender, EventArgs e)
@@ -513,6 +538,22 @@ namespace БазаНСИ
                 }
             }
 
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            for (int i2 = 0; i2 < 1500; i2++)
+            {
+                if (Sps[i2] != null)
+                {
+                    if (Sps[i2].sortir != null)
+                    {
+
+                        Sps[i2].GetInfoSst();
+
+                    }
+                }
+            }
         }
 
         void panel1_DragDrop(object sender, DragEventArgs e)
@@ -559,33 +600,58 @@ namespace БазаНСИ
         {
 
             Console.WriteLine("-------------------------\n-------------------------\n-------------------------");
-            Console.WriteLine(Sps[1].doc_name);
-            Base[0] = new Baza();
-            Base[0].obozn = ObrezFileName(path[0]);
-            Base[0].ispolnitel = textBox1.Text;
-            stroka_base = 1;
+
+            for (int i = 0; i < Sps.Length; i++)
+            {
+
+                if (Sps[i] != null)
+                {
+                    Base[0] = new Baza();
+                    Base[0].naimen = Sps[i].naimen;
+                    Base[0].obozn = Sps[i].obozn;
+                    Base[0].ispolnitel = textBox1.Text;
+                    Sps[i].sortir = true;
+                    stroka_base = 1;
+                    break;
+                    
+                }
+            }
+
+
 
             for (int i=0; i< Sps.Length; i++)
             {
-                
-                if (Sps[i]!= null)
+
+                if (Sps[i] != null)
                 {
-                    if (Sps[i].tip_stroki == "CБ")
+                    if ((Sps[i].tip_stroki == "CБ") & (Sps[i].sortir == false))
                     {
                         Base[stroka_base] = new Baza();
                         Base[stroka_base].obozn = Sps[i].obozn;
+                        Base[stroka_base].naimen = Sps[i].naimen;
                         Base[stroka_base].ispolnitel = textBox1.Text;
+                        Base[stroka_base].type_cher = "СБ";
+
+
+
+                        Sps[i].sortir = true;
+
+
                         stroka_base += 1;
                         Console.WriteLine("Это сборка " + i);
                         for (int i2 = 0; i2 < Sps.Length; i2++)
                         {
                             if (Sps[i2] != null)
                             {
-                                if(Sps[i2].doc_name == Sps[i].obozn)
+                                if (Sps[i2].doc_name == Sps[i].obozn)
                                 {
                                     Base[stroka_base] = new Baza();
                                     Base[stroka_base].obozn = Sps[i2].obozn;
+                                    Base[stroka_base].naimen = Sps[i2].naimen;
                                     Base[stroka_base].ispolnitel = textBox1.Text;
+                                    Base[stroka_base].type_cher = Sps[i2].tip_stroki; 
+
+                                    Sps[i2].sortir = true;
                                     stroka_base += 1;
 
                                 }
@@ -593,6 +659,89 @@ namespace БазаНСИ
                             }
                         }
                     }
+                    if ((Sps[i].tip_stroki == "Д") & (Sps[i].sortir == false))
+                    {
+                        Base[stroka_base] = new Baza();
+                        Base[stroka_base].obozn = Sps[i].obozn;
+                        Base[stroka_base].naimen = Sps[i].naimen;
+                        Base[stroka_base].type_cher = "Д";
+                        Base[stroka_base].ispolnitel = textBox1.Text;
+                        Base[stroka_base].material = "";
+                        Sps[i].sortir = true;
+                        
+
+                        for (int i3 = 0; i3 < Sps.Length; i3++)
+                        {
+                            if (Sps[i3] != null)
+                            {
+                                if (Sps[i3].doc_name == Sps[i].obozn)
+                                {
+                                    if (Sps[i3].sortir == false)
+                                    {
+                                        Base[stroka_base].material = Sps[i3].material;
+                                        Sps[i3].sortir = true;
+                                    }
+                                }
+
+                            }
+
+                        }
+                        stroka_base += 1;
+
+
+
+
+                    }
+                    
+                    if ((Sps[i].tip_stroki == "БЧ") & (Sps[i].sortir == false))
+                    {
+                        Base[stroka_base] = new Baza();
+                        Base[stroka_base].obozn = Sps[i].obozn;
+                        Base[stroka_base].naimen = Sps[i].naimen;
+                        Base[stroka_base].type_cher = "БЧ";
+                        Base[stroka_base].ispolnitel = textBox1.Text;
+                        Sps[i].sortir = true;
+                        stroka_base += 1;
+                    }
+                    if ((Sps[i].tip_stroki == "СТ") & (Sps[i].sortir == false))
+                    {
+                        Base[stroka_base] = new Baza();
+                        Base[stroka_base].obozn = Sps[i].obozn;
+                        Base[stroka_base].naimen = Sps[i].naimen;
+                        Base[stroka_base].type_cher = "СТ";
+                        Base[stroka_base].ispolnitel = textBox1.Text;
+                        Sps[i].sortir = true;
+                        stroka_base += 1;
+                    }
+                    if ((Sps[i].tip_stroki == "П") & (Sps[i].sortir == false))
+                    {
+                        Base[stroka_base] = new Baza();
+                        Base[stroka_base].obozn = Sps[i].obozn;
+                        Base[stroka_base].naimen = Sps[i].naimen;
+                        Base[stroka_base].type_cher = "П";
+                        Base[stroka_base].ispolnitel = textBox1.Text;
+                        Sps[i].sortir = true;
+                        stroka_base += 1;
+                    }
+                    if ((Sps[i].tip_stroki == "М") & (Sps[i].sortir == false))
+                    {
+                        Base[stroka_base] = new Baza();
+                        Base[stroka_base].obozn = Sps[i].obozn;
+                        Base[stroka_base].naimen = Sps[i].naimen;
+                        Base[stroka_base].type_cher = "М";
+                        Base[stroka_base].ispolnitel = textBox1.Text;
+                        Sps[i].sortir = true;
+                        stroka_base += 1;
+                    }
+
+
+
+
+
+
+
+
+
                 }
             }
 

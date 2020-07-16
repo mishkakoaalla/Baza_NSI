@@ -20,6 +20,7 @@ namespace БазаНСИ
         public string tip_stroki { get; set; } //Сборка, деталь, материал, прочие изделия, БЧ ....
         public string material { get; set; }
         public string doc_name { get; set; }
+        public bool sortir { get; set; }
 
         public spec_stroka()
         {
@@ -35,17 +36,18 @@ namespace БазаНСИ
             material = material;
             doc_name = doc_name;
             tip_stroki = tip_stroki;
+            sortir = sortir;
         }
 
         public void GetInfoSst()
         {
             if (tip_stroki != "Материал из детали")
             {
-                Console.WriteLine($" Имя документа : {doc_name} Тип строки: {tip_stroki}  Обозначение: {obozn}  Наименование: {naimen}  Количество : {kol}  ");
+                Console.WriteLine($" Имя документа : {doc_name} Сортирован: {sortir} Тип строки: {tip_stroki}  Обозначение: {obozn}  Наименование: {naimen}  Количество : {kol}  ");
             }
             else
             {
-                Console.WriteLine($" Имя документа : {doc_name} Тип строки: {tip_stroki}  Обозначение: {obozn}  Наименование: {naimen}  Количество : {kol}  Материал: {material} ");
+                Console.WriteLine($" Имя документа : {doc_name} Сортирован: {sortir} Тип строки: {tip_stroki}  Обозначение: {obozn}  Наименование: {naimen}  Количество : {kol}  Материал: {material} ");
             }
         }
 
