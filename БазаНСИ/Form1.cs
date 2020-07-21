@@ -36,6 +36,11 @@ namespace БазаНСИ
         public int nomer_razdela_base = 0;
         public string obrez_SB;
         public int stroka_base;
+        //public Excel.Worksheet sheet;
+        
+
+
+
 
         public ISpecificationCommentObject obj; //Объект спецификации
         public ISpecificationBaseObject obj_base; //Базовый Объект спецификации
@@ -117,15 +122,9 @@ namespace БазаНСИ
 
         public void START()
         {
-            /*
-            Excel.Application ex = new Excel.Application();
-            ex.Visible = true;
-            ex.SheetsInNewWorkbook = 2;
-            Excel.Workbook workBook = ex.Workbooks.Add(Type.Missing);
-            ex.DisplayAlerts = false;
-            Excel.Worksheet sheet = (Excel.Worksheet)ex.Worksheets.get_Item(1);
-            sheet.Name = "База НСИ";
-            */
+            
+
+            
 
 
             int stolb = 1;//   A - B - C - D     //Cells(5, 3) = C5
@@ -163,8 +162,7 @@ namespace БазаНСИ
                 
                 SpecificationDescription Specification_Descriptions = doc.SpecificationDescriptions.Active;
 
-                Specification_Descriptions.ShowExcludedObjects = true;
-                Specification_Descriptions.Update();
+
 
 
                 if (Specification_Descriptions != null)
@@ -173,7 +171,7 @@ namespace БазаНСИ
                     ISpecificationCommentObjects SpcObjects = Specification_Descriptions.CommentObjects;
                     ISpecificationBaseObjects SpcObjectsBase = Specification_Descriptions.BaseObjects;
 
-                    (ISpecificationBaseObjects)SpcObjectsBase.Draw
+                    
                     //Console.WriteLine(" ВСПОМОГАТЕЛЬНЫЕ объекты " + SpcObjects.Count);
                     //Console.WriteLine(" Базовые объекты " + SpcObjectsBase.Count);
                     int kol_com = SpcObjects.Count;
@@ -525,18 +523,95 @@ namespace БазаНСИ
 
         private void button4_Click(object sender, EventArgs e)
         {
+            int ex_stroka = 1;
+            int ex_stolb = 1;
+
+            Excel.Application ex = new Excel.Application();
+            ex.Visible = true;
+            ex.SheetsInNewWorkbook = 2;
+            Excel.Workbook workBook = ex.Workbooks.Add(Type.Missing);
+            ex.DisplayAlerts = false;
+            Excel.Worksheet sheet = (Excel.Worksheet)ex.Worksheets.get_Item(1);
+            sheet.Name = "База НСИ";
+
             for (int i2 = 0; i2 < Base.Length; i2++)
             {
                 if (Base[i2] != null)
                 {
                     if (Base[i2].ispolnitel != null)
                     {
+                        for (int i3 = 0; i3 < 11; i3++)
+                        {
+                            switch (i3)
+                            {
+                                case 2:
+                                    sheet.Cells[ex_stroka, ex_stolb] = Base[i2].vhodimost;
+                                    ex_stolb += 1;
+                                    break;
 
-                        Base[i2].DrawBase();
+                                case 3:
+                                    sheet.Cells[ex_stroka, ex_stolb] = Base[i2].naimen;
+                                    ex_stolb += 1;
+                                    break;
+                                case 4:
+                                    sheet.Cells[ex_stroka, ex_stolb] = Base[i2].obozn;
+                                    ex_stolb += 1;
+                                    break;
+                                case 5:
+                                    sheet.Cells[ex_stroka, ex_stolb] = Base[i2].type_cher;
+                                    ex_stolb += 1;
+                                    break;
+                                case 6:
+                                    sheet.Cells[ex_stroka, ex_stolb] = Base[i2].ispolnitel;
+                                    ex_stolb += 1;
+                                    break;
+                                case 7:
+                                    sheet.Cells[ex_stroka, ex_stolb] = Base[i2].gotovnost;
+                                    ex_stolb += 1;
+                                    break;
+                                case 8:
+                                    sheet.Cells[ex_stroka, ex_stolb] = Base[i2].kuda_vhodit;
+                                    ex_stolb += 4;
+                                    break;
+                                case 9:
+                                    sheet.Cells[ex_stroka, ex_stolb] = Base[i2].material;
+                                    ex_stolb += 6;
+                                    break;
+                                case 10:
+                                    sheet.Cells[ex_stroka, ex_stolb] = Base[i2].kol;
+                                    ex_stolb += 1;
+                                    break;
+                            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                            //Base[i2].DrawBase();
+                            
+                            
+                        }
+                        ex_stolb = 1;
+
+
+
 
                     }
+                    ex_stroka += 1;
                 }
+                
             }
+           
 
         }
 
@@ -610,6 +685,9 @@ namespace БазаНСИ
                     Base[0].naimen = Sps[i].naimen;
                     Base[0].obozn = Sps[i].obozn;
                     Base[0].ispolnitel = textBox1.Text;
+                    Base[0].vhodimost = textBox3.Text;
+                    Base[0].gotovnost = textBox2.Text;
+                    Base[0].type_cher = "СБ";
                     Sps[i].sortir = true;
                     stroka_base = 1;
                     break;
@@ -631,7 +709,9 @@ namespace БазаНСИ
                         Base[stroka_base].naimen = Sps[i].naimen;
                         Base[stroka_base].ispolnitel = textBox1.Text;
                         Base[stroka_base].type_cher = "СБ";
-
+                        Base[stroka_base].vhodimost = textBox3.Text;
+                        Base[stroka_base].gotovnost = textBox2.Text;
+                        Base[stroka_base].kol = Sps[i].kol;
 
 
                         Sps[i].sortir = true;
@@ -646,10 +726,28 @@ namespace БазаНСИ
                                 if (Sps[i2].doc_name == Sps[i].obozn)
                                 {
                                     Base[stroka_base] = new Baza();
-                                    Base[stroka_base].obozn = Sps[i2].obozn;
-                                    Base[stroka_base].naimen = Sps[i2].naimen;
+
                                     Base[stroka_base].ispolnitel = textBox1.Text;
                                     Base[stroka_base].type_cher = Sps[i2].tip_stroki; 
+
+                                    if ((Sps[i2].tip_stroki != "М") & (Sps[i2].tip_stroki != "СТ") & (Sps[i2].tip_stroki != "П"))
+                                         {
+                                        Base[stroka_base].obozn = Sps[i2].obozn;
+                                        Base[stroka_base].naimen = Sps[i2].naimen;
+                                    }
+                                    else
+                                    {
+                                        if (Sps[i2].tip_stroki != "М")
+                                        {
+                                            Base[stroka_base].material = Sps[i2].naimen;
+                                        }
+                                        if (Sps[i2].tip_stroki != "СТ")
+                                        {
+                                            Base[stroka_base].material = Sps[i2].naimen;
+                                        }
+                                    }
+
+
 
                                     Sps[i2].sortir = true;
                                     stroka_base += 1;
@@ -698,6 +796,7 @@ namespace БазаНСИ
                         Base[stroka_base] = new Baza();
                         Base[stroka_base].obozn = Sps[i].obozn;
                         Base[stroka_base].naimen = Sps[i].naimen;
+
                         Base[stroka_base].type_cher = "БЧ";
                         Base[stroka_base].ispolnitel = textBox1.Text;
                         Sps[i].sortir = true;
@@ -706,9 +805,10 @@ namespace БазаНСИ
                     if ((Sps[i].tip_stroki == "СТ") & (Sps[i].sortir == false))
                     {
                         Base[stroka_base] = new Baza();
-                        Base[stroka_base].obozn = Sps[i].obozn;
-                        Base[stroka_base].naimen = Sps[i].naimen;
+                       // Base[stroka_base].obozn = Sps[i].obozn;
+                        //Base[stroka_base].naimen = Sps[i].naimen;
                         Base[stroka_base].type_cher = "СТ";
+                        Base[stroka_base].material = Sps[i].naimen;
                         Base[stroka_base].ispolnitel = textBox1.Text;
                         Sps[i].sortir = true;
                         stroka_base += 1;
@@ -717,7 +817,7 @@ namespace БазаНСИ
                     {
                         Base[stroka_base] = new Baza();
                         Base[stroka_base].obozn = Sps[i].obozn;
-                        Base[stroka_base].naimen = Sps[i].naimen;
+                        Base[stroka_base].material = Sps[i].naimen;
                         Base[stroka_base].type_cher = "П";
                         Base[stroka_base].ispolnitel = textBox1.Text;
                         Sps[i].sortir = true;
@@ -726,8 +826,10 @@ namespace БазаНСИ
                     if ((Sps[i].tip_stroki == "М") & (Sps[i].sortir == false))
                     {
                         Base[stroka_base] = new Baza();
-                        Base[stroka_base].obozn = Sps[i].obozn;
-                        Base[stroka_base].naimen = Sps[i].naimen;
+                        //Base[stroka_base].obozn = Sps[i].obozn;
+                        //Base[stroka_base].naimen = Sps[i].naimen;
+                        //Base[stroka_base].naimen = Sps[i].naimen;
+                        Base[stroka_base].material = Sps[i].naimen;
                         Base[stroka_base].type_cher = "М";
                         Base[stroka_base].ispolnitel = textBox1.Text;
                         Sps[i].sortir = true;
