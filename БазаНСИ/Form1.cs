@@ -611,7 +611,10 @@ namespace БазаНСИ
                 }
                 
             }
-           
+            sheet.Columns["B:B"].ColumnWidth = 45.0;
+            sheet.Columns["C:C"].ColumnWidth = 20.0;
+            sheet.Columns["K:K"].ColumnWidth = 40.0;
+
 
         }
 
@@ -727,13 +730,19 @@ namespace БазаНСИ
                                 {
                                     Base[stroka_base] = new Baza();
 
+
                                     Base[stroka_base].ispolnitel = textBox1.Text;
-                                    Base[stroka_base].type_cher = Sps[i2].tip_stroki; 
+                                    Base[stroka_base].type_cher = Sps[i2].tip_stroki;
+
+                                    Base[stroka_base].kol = Sps[i2].kol;
+                                    Base[stroka_base].gotovnost= textBox2.Text;
+
 
                                     if ((Sps[i2].tip_stroki != "М") & (Sps[i2].tip_stroki != "СТ") & (Sps[i2].tip_stroki != "П"))
                                          {
                                         Base[stroka_base].obozn = Sps[i2].obozn;
                                         Base[stroka_base].naimen = Sps[i2].naimen;
+
                                     }
                                     else
                                     {
@@ -766,7 +775,10 @@ namespace БазаНСИ
                         Base[stroka_base].ispolnitel = textBox1.Text;
                         Base[stroka_base].material = "";
                         Sps[i].sortir = true;
-                        
+
+                        Base[stroka_base].kol = Sps[i].kol;
+                        Base[stroka_base].gotovnost = textBox2.Text;
+
 
                         for (int i3 = 0; i3 < Sps.Length; i3++)
                         {
@@ -778,6 +790,7 @@ namespace БазаНСИ
                                     {
                                         Base[stroka_base].material = Sps[i3].material;
                                         Sps[i3].sortir = true;
+
                                     }
                                 }
 
@@ -796,42 +809,50 @@ namespace БазаНСИ
                         Base[stroka_base] = new Baza();
                         Base[stroka_base].obozn = Sps[i].obozn;
                         Base[stroka_base].naimen = Sps[i].naimen;
+                        Base[stroka_base].kol = Sps[i].kol;
+
 
                         Base[stroka_base].type_cher = "БЧ";
                         Base[stroka_base].ispolnitel = textBox1.Text;
+                        Base[stroka_base].gotovnost = textBox2.Text;
+
                         Sps[i].sortir = true;
                         stroka_base += 1;
                     }
                     if ((Sps[i].tip_stroki == "СТ") & (Sps[i].sortir == false))
                     {
                         Base[stroka_base] = new Baza();
-                       // Base[stroka_base].obozn = Sps[i].obozn;
-                        //Base[stroka_base].naimen = Sps[i].naimen;
+                        Base[stroka_base].kol = Sps[i].kol;
+
                         Base[stroka_base].type_cher = "СТ";
                         Base[stroka_base].material = Sps[i].naimen;
                         Base[stroka_base].ispolnitel = textBox1.Text;
+                        Base[stroka_base].gotovnost = textBox2.Text;
                         Sps[i].sortir = true;
                         stroka_base += 1;
                     }
                     if ((Sps[i].tip_stroki == "П") & (Sps[i].sortir == false))
                     {
                         Base[stroka_base] = new Baza();
+                        Base[stroka_base].kol = Sps[i].kol;
                         Base[stroka_base].obozn = Sps[i].obozn;
                         Base[stroka_base].material = Sps[i].naimen;
                         Base[stroka_base].type_cher = "П";
                         Base[stroka_base].ispolnitel = textBox1.Text;
+                        Base[stroka_base].gotovnost = textBox2.Text;
                         Sps[i].sortir = true;
                         stroka_base += 1;
                     }
                     if ((Sps[i].tip_stroki == "М") & (Sps[i].sortir == false))
                     {
                         Base[stroka_base] = new Baza();
-                        //Base[stroka_base].obozn = Sps[i].obozn;
-                        //Base[stroka_base].naimen = Sps[i].naimen;
-                        //Base[stroka_base].naimen = Sps[i].naimen;
+
+                        Base[stroka_base].kol = Sps[i].kol;
+
                         Base[stroka_base].material = Sps[i].naimen;
                         Base[stroka_base].type_cher = "М";
                         Base[stroka_base].ispolnitel = textBox1.Text;
+                        Base[stroka_base].gotovnost = textBox2.Text;
                         Sps[i].sortir = true;
                         stroka_base += 1;
                     }
@@ -845,6 +866,7 @@ namespace БазаНСИ
 
 
                 }
+
             }
 
 
