@@ -634,6 +634,11 @@ namespace БазаНСИ
             }
         }
 
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
         void panel1_DragDrop(object sender, DragEventArgs e)
         {
             var allowedExtensions = new[] { ".cdw", ".spw"};
